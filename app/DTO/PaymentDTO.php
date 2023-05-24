@@ -4,7 +4,8 @@ namespace App\DTO;
 
 class PaymentDTO
 {
-    private array $issuer;
+    private array $issuerId;
+    private string $paymentMethodId;
     private array $paymentTypeId;
     private string $email;
     private string $token;
@@ -12,61 +13,114 @@ class PaymentDTO
 
     public function __construct($data)
     {
-        $this->issuer = $data['issuer'][0];
+        $this->issuerId = $data['issuer'][0]['id'];
+        $this->paymentMethodId = $data['payment_method_id'];
         $this->paymentTypeId = $data['payment_type_id'][0];
         $this->email = $data['email'];
         $this->token = $data['token'];
         $this->amount = $data['amount'];
     }
 
-    public function setIssuer($issuer) : void
+    /**
+     * @param $issuer
+     * @return void
+     */
+    public function setIssuerId($issuer) : void
     {
-        $this->issuer = $issuer;
+        $this->issuerId = $issuer;
     }
 
-    public function getIssuer(): array
+    /**
+     * @return int
+     */
+    public function getIssuerId(): int
     {
-        return $this->issuer;
+        return (int) $this->issuerId;
     }
 
+    /**
+     * @return string
+     */
+    public function getPaymentMethodId(): string
+    {
+        return $this->paymentMethodId;
+    }
+
+    /**
+     * @param string $paymentMethodId
+     * @return void
+     */
+    public function setPaymentMethodId(string $paymentMethodId): void
+    {
+        $this->paymentMethodId = $paymentMethodId;
+    }
+
+    /**
+     * @param $paymentTypeId
+     * @return void
+     */
     public function setPaymentTypeId($paymentTypeId) : void
     {
         $this->paymentTypeId = $paymentTypeId;
     }
 
+    /**
+     * @return array
+     */
     public function getPaymentTypeId() : array
     {
         return $this->paymentTypeId;
     }
 
+    /**
+     * @param $email
+     * @return void
+     */
     public function setEmail($email) : void
     {
         $this->email = $email;
     }
 
+    /**
+     * @return string
+     */
     public function getEmail() : string
     {
         return $this->email;
     }
 
+    /**
+     * @param $token
+     * @return void
+     */
     public function setToken($token) : void
     {
         $this->token = $token;
     }
 
+    /**
+     * @return string
+     */
     public function getToken() : string
     {
         return $this->token;
     }
 
+    /**
+     * @param $amount
+     * @return void
+     */
     public function setAmount($amount) : void
     {
         $this->amount = $amount;
     }
 
+    /**
+     * @return float
+     */
     public function getAmount() : float
     {
-        return $this->amount;
+        return (float) $this->amount;
     }
 
     /**
