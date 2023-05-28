@@ -17,14 +17,16 @@ $router->get('/version', function () use ($router) {
 
 /** @var Router $router */
 $router->group(['prefix' => 'v1'], function () use ($router) {
-    $router->get('/user', function () use ($router) {
-        return $router->app->version() . ' Users API';
-    });
-
     $router->group(['prefix' => 'payment'], function () use ($router) {
         $router->get('/', 'PaymentController@get');
         $router->post('/', 'PaymentController@store');
     });
+
+    $router->get('/user', function () use ($router) {
+        return $router->app->version() . ' Users API';
+    });
+
+    $router->post('/mp/webhook', 'WebhookController@handler');
 });
 
 $router->group(['prefix' => 'fake'], function () use ($router) {

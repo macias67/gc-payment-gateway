@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\DTO\MPWebhookDTO;
 use App\DTO\PaymentDTO;
+use Illuminate\Support\Facades\Log;
 use MercadoPago\Payment;
 
 class PaymentService
@@ -42,5 +44,16 @@ class PaymentService
         $card = $this->paymentProvider->createCard($customer->id, $paymentData);
         // Create payment
         return $this->paymentProvider->createPayment($customer->id, $paymentData);
+    }
+
+    /**
+     * @param MPWebhookDTO $webhookData
+     * @return void
+     */
+    public function processWebhook(MPWebhookDTO $webhookData): void
+    {
+        $payment = $this->paymentProvider->getPayment($webhookData->getPaymentId());
+
+        Log::debug("payment webhook", $payment->toArray());
     }
 }
