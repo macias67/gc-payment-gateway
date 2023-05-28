@@ -2,23 +2,24 @@
 
 namespace App\DTO;
 
+use JsonException;
+
 class PaymentDTO
 {
-    private array $issuerId;
+    private int $issuerId;
     private string $paymentMethodId;
-    private array $paymentTypeId;
+    // private array $paymentTypeId;
     private string $email;
     private string $token;
     private float $amount;
 
     public function __construct($data)
     {
-        $this->issuerId = $data['issuer'][0]['id'];
+        $this->issuerId = $data['issuer_id'];
         $this->paymentMethodId = $data['payment_method_id'];
-        $this->paymentTypeId = $data['payment_type_id'][0];
-        $this->email = $data['email'];
+        $this->email = $data['payer']['email'];
         $this->token = $data['token'];
-        $this->amount = $data['amount'];
+        $this->amount = $data['transaction_amount'];
     }
 
     /**
@@ -61,7 +62,7 @@ class PaymentDTO
      */
     public function setPaymentTypeId($paymentTypeId) : void
     {
-        $this->paymentTypeId = $paymentTypeId;
+        // $this->paymentTypeId = $paymentTypeId;
     }
 
     /**
@@ -69,7 +70,8 @@ class PaymentDTO
      */
     public function getPaymentTypeId() : array
     {
-        return $this->paymentTypeId;
+        // return $this->paymentTypeId;
+        return [];
     }
 
     /**
@@ -124,7 +126,7 @@ class PaymentDTO
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function toJson()
     {

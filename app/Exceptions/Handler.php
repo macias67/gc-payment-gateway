@@ -53,6 +53,14 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $e)
     {
+        if ($e instanceof CustomerException) {
+            return new JsonResponse([
+                'error' => $e->getMessage(),
+                'message' => $e->getResponseMessage(),
+                'code' => $e->getCode(),
+            ], $e->getStatusCode());
+        }
+
         return parent::render($request, $e);
     }
 }

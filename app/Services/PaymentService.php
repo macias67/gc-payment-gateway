@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTO\PaymentDTO;
+use MercadoPago\Payment;
 
 class PaymentService
 {
@@ -18,9 +19,9 @@ class PaymentService
 
     /**
      * @param PaymentDTO $paymentData
-     * @return string
+     * @return Payment
      */
-    public function processPayment(PaymentDTO $paymentData) : string
+    public function processPayment(PaymentDTO $paymentData): Payment
     {
         // Validate if customer exist
         $customer = $this->paymentProvider->getCustomer($paymentData->getEmail());
@@ -31,8 +32,6 @@ class PaymentService
         // Create card's customer
         $card = $this->paymentProvider->createCard($customer->id, $paymentData);
         // Create payment
-        $payment = $this->paymentProvider->createPayment($customer->id, $paymentData);
-
-        return $payment->id;
+        return $this->paymentProvider->createPayment($customer->id, $paymentData);
     }
 }

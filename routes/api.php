@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\PaymentController;
+use Faker\Factory;
 use Laravel\Lumen\Routing\Router;
 
 /** @var Router $router */
@@ -19,6 +19,10 @@ $router->get('/version', function () use ($router) {
 $router->group(['prefix' => 'v1'], function () use ($router) {
     $router->get('/user', function () use ($router) {
         return $router->app->version() . ' Users API';
+    });
+
+    $router->get('/email', function () use ($router) {
+        return response()->json(['email' => Factory::create()->email]);
     });
 
     $router->post('/payment', 'PaymentController@store');

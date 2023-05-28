@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\View\ViewServiceProvider;
+
 require_once __DIR__.'/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
@@ -74,9 +76,10 @@ $app->configure('payment');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+    Fruitcake\Cors\HandleCors::class,
+    // App\Http\Middleware\ExampleMiddleware::class
+]);
 
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
@@ -93,9 +96,11 @@ $app->configure('payment');
 |
 */
 
-$app->register(\Illuminate\View\ViewServiceProvider::class);
+$app->register(ViewServiceProvider::class);
 
 $app->register(App\Providers\PaymentServiceProvider::class);
+
+$app->register(Fruitcake\Cors\CorsServiceProvider::class);
 
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
