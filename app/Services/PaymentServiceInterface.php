@@ -15,5 +15,7 @@ interface PaymentServiceInterface
     public function createPayment(string $customerId, PaymentDTO $paymentDTO);
 
     public function getPayment(int $paymentId);
+
+    public function isApproved(string $paymentStatus);
 }
 

@@ -12,6 +12,7 @@ class PaymentDTO
     private string $token;
     private int $installments;
     private float $amount;
+    private int $idp;
 
     public function __construct($data)
     {
@@ -21,6 +22,7 @@ class PaymentDTO
         $this->token = $data['token'];
         $this->installments = $data['installments'];
         $this->amount = $data['transaction_amount'];
+        $this->idp = $data['idp'];
     }
 
     /**
@@ -142,6 +144,21 @@ class PaymentDTO
         $this->installments = $installments;
     }
 
+    /**
+     * @return int
+     */
+    public function getIdp(): int
+    {
+        return $this->idp;
+    }
+
+    /**
+     * @param int $idp
+     */
+    public function setIdp(int $idp): void
+    {
+        $this->idp = $idp;
+    }
 
     /**
      * @throws JsonException

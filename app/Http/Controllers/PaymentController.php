@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTO\PaymentDTO;
+use App\Services\ActivationService;
 use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,7 +29,9 @@ class PaymentController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function store(Request $request, PaymentService $paymentService): JsonResponse
+    public function store(Request           $request,
+                          PaymentService    $paymentService,
+                          ActivationService $activationService): JsonResponse
     {
         $data = $request->all();
         $paymentDTO = new PaymentDTO($data);
@@ -36,7 +39,10 @@ class PaymentController extends Controller
         // Process payment
         $payment = $paymentService->processPayment($paymentDTO);
 
-        // Reactivate Service
+        if ($paymentService->isApprovedPayment($payment->status)) {
+            // Reactivate Service
+            $activationService->sendActivationRequest($payment->id, $paymentDTO->getIdp(), $payment->transaction_amount);
+        }
 
         return response()->json([
             'message' => 'Payment processed successfully',
@@ -45,7 +51,8 @@ class PaymentController extends Controller
                 'status' => $payment->status,
                 'status_detail' => $payment->status_detail,
                 'payment_type_id' => $payment->payment_type_id
-            ]
+            ],
+            'idp' => $paymentDTO->getIdp()
         ], Response::HTTP_CREATED);
     }
 }

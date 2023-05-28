@@ -15,6 +15,8 @@ use MercadoPago\SDK;
 
 class MercadoPagoService implements PaymentServiceInterface
 {
+    public const STATUS_APPROVED = 'approved';
+
     public function __construct()
     {
         SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
@@ -189,6 +191,15 @@ class MercadoPagoService implements PaymentServiceInterface
             ]);
             throw new CardException($exception->getMessage());
         }
+    }
+
+    /**
+     * @param string $paymentStatus
+     * @return bool
+     */
+    public function isApproved(string $paymentStatus): bool
+    {
+        return $paymentStatus === self::STATUS_APPROVED;
     }
 }
 

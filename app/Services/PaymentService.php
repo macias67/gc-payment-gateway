@@ -56,4 +56,13 @@ class PaymentService
 
         Log::debug("payment webhook", $payment->toArray());
     }
+
+    /**
+     * @param string $paymentStatus
+     * @return bool
+     */
+    public function isApprovedPayment(string $paymentStatus): bool
+    {
+        return $this->paymentProvider->isApproved($paymentStatus);
+    }
 }
