@@ -53,7 +53,8 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $e)
     {
-        if ($e instanceof CustomerException) {
+        if ($e instanceof CustomerException ||
+            $e instanceof PaymentException) {
             return new JsonResponse([
                 'error' => $e->getMessage(),
                 'message' => $e->getResponseMessage(),

@@ -10,6 +10,24 @@ use Illuminate\Http\Response;
 
 class PaymentController extends Controller
 {
+    public function get(Request $request, PaymentService $paymentService): JsonResponse
+    {
+        $paymentId = $request->get('id', 0);
+
+        // Get Payment info
+        $result = $paymentService->getPayment($paymentId);
+
+        return response()->json([
+            'message' => 'Payment information',
+            'payment' => ($result === null) ? [] : [
+                'id' => $result->id,
+                'status' => $result->status,
+                'status_detail' => $result->status_detail,
+                'payment_type_id' => $result->payment_type_id
+            ]
+        ], Response::HTTP_OK);
+    }
+
     public function store(Request $request, PaymentService $paymentService): JsonResponse
     {
         $data = $request->all();

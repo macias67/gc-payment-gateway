@@ -3,20 +3,47 @@
 namespace App\Services;
 
 use App\DTO\PaymentDTO;
+use App\Exceptions\CardException;
 use App\Exceptions\CustomerException;
+use App\Exceptions\PaymentException;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use MercadoPago\Card;
 use MercadoPago\Customer;
 use MercadoPago\Payment;
 use MercadoPago\SDK;
-use RuntimeException;
 
 class MercadoPagoService implements PaymentServiceInterface
 {
     public function __construct()
     {
         SDK::setAccessToken(env('MP_ACCESS_TOKEN'));
+    }
+
+    /**
+     * @param string $email
+     * @return Customer|null
+     * @throws CustomerException
+     */
+    public function getCustomer(string $email): ?Customer
+    {
+        try {
+            $filters = ["email" => $email];
+            $results = Customer::search($filters);
+
+            if ($results->count() > 0) {
+                return $results->offsetGet(0);
+            }
+
+            return null;
+        } catch (Exception $exception) {
+            Log::error("custom error getting information", [
+                'message' => $exception->getMessage(),
+                'status' => $exception->getCode(),
+                'file' => __FILE__,
+            ]);
+            throw new CustomerException($exception->getMessage());
+        }
     }
 
     /**
@@ -44,8 +71,7 @@ class MercadoPagoService implements PaymentServiceInterface
             ]);
 
             throw new CustomerException(
-                $error->causes[0]->description,
-                $error->causes[0]->code
+                $error->causes[0]->description . ' code ' . $error->causes[0]->code
             );
         }
 
@@ -60,60 +86,72 @@ class MercadoPagoService implements PaymentServiceInterface
     }
 
     /**
-     * @param string $customerId
-     * @param PaymentDTO $paymentDTO
-     * @return Payment
-     * @throws Exception
+     * @param int $paymentId
+     * @return Payment|null
+     * @throws PaymentException
      */
-    public function createPayment(string $customerId, PaymentDTO $paymentDTO) : Payment
+    public function getPayment(int $paymentId): ?Payment
     {
-        $payment = new Payment();
+        if ($paymentId === 0) {
+            return null;
+        }
 
-        $payment->transaction_amount = $paymentDTO->getAmount();
-        $payment->token = $paymentDTO->getToken();
-        $payment->description = "Pago Mensualidad Grupo Capitolio";
-        $payment->installments = 1;
-        $payment->payment_method_id = $paymentDTO->getPaymentMethodId();
-        $payment->issuer_id = $paymentDTO->getIssuerId();
-        $payment->payer = [
-            "entity_type" => "individual",
-            "type" => "customer",
-            "id" => $customerId,
-            "email" => $paymentDTO->getEmail()
-        ];
-        $payment->statement_descriptor = "GRUPOCAPITOLIO";
-        //  $payment->capture = true;
-        $payment->save();
-
-        Log::info("payment created", [
-            'id' => $payment->id,
-            'customer_id' => $customerId,
-            'status' => $payment->status,
-            'status_detail' => $payment->status_detail,
-            'payment_type_id' => $payment->payment_type_id,
-            'file' => __FILE__,
-        ]);
-
-        return $payment;
+        try {
+            return Payment::find_by_id($paymentId);
+        } catch (Exception $exception) {
+            Log::error("payment error getting information", [
+                'message' => $exception->getMessage(),
+                'status' => $exception->getCode(),
+                'file' => __FILE__,
+            ]);
+            throw new PaymentException($exception->getMessage());
+        }
     }
 
     /**
-     * @param string $email
-     * @return Customer|null
+     * @param string $customerId
+     * @param PaymentDTO $paymentDTO
+     * @return Payment
+     * @throws PaymentException
      */
-    public function getCustomer(string $email): ?Customer
+    public function createPayment(string $customerId, PaymentDTO $paymentDTO): Payment
     {
         try {
-            $filters = ["email" => $email];
-            $results = Customer::search($filters);
+            $payment = new Payment();
 
-            if ($results->count() > 0) {
-                return $results->offsetGet(0);
-            }
+            $payment->transaction_amount = $paymentDTO->getAmount();
+            $payment->token = $paymentDTO->getToken();
+            $payment->description = "Pago Mensualidad Grupo Capitolio";
+            $payment->installments = $paymentDTO->getInstallments();
+            $payment->payment_method_id = $paymentDTO->getPaymentMethodId();
+            $payment->issuer_id = $paymentDTO->getIssuerId();
+            $payment->payer = [
+                "entity_type" => "individual",
+                "type" => "customer",
+                "id" => $customerId,
+                "email" => $paymentDTO->getEmail()
+            ];
+            $payment->statement_descriptor = "GRUPOCAPITOLIO";
+            //  $payment->capture = true;
+            $payment->save();
 
-            return null;
+            Log::info("payment created", [
+                'id' => $payment->id,
+                'customer_id' => $customerId,
+                'status' => $payment->status,
+                'status_detail' => $payment->status_detail,
+                'payment_type_id' => $payment->payment_type_id,
+                'file' => __FILE__,
+            ]);
+
+            return $payment;
         } catch (Exception $exception) {
-            throw new RuntimeException($exception->getMessage());
+            Log::error("payment error", [
+                'message' => $exception->getMessage(),
+                'status' => $exception->getCode(),
+                'file' => __FILE__,
+            ]);
+            throw new PaymentException($exception->getMessage());
         }
     }
 
@@ -121,6 +159,7 @@ class MercadoPagoService implements PaymentServiceInterface
      * @param string $customerId
      * @param PaymentDTO $paymentDTO
      * @return Card
+     * @throws CardException
      */
     public function createCard(string $customerId, PaymentDTO $paymentDTO): Card
     {
@@ -143,7 +182,12 @@ class MercadoPagoService implements PaymentServiceInterface
 
             return $card;
         } catch (Exception $exception) {
-            throw new RuntimeException($exception->getMessage());
+            Log::error("card error", [
+                'message' => $exception->getMessage(),
+                'status' => $exception->getCode(),
+                'file' => __FILE__,
+            ]);
+            throw new CardException($exception->getMessage());
         }
     }
 }

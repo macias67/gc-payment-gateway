@@ -8,9 +8,9 @@ class PaymentDTO
 {
     private int $issuerId;
     private string $paymentMethodId;
-    // private array $paymentTypeId;
     private string $email;
     private string $token;
+    private int $installments;
     private float $amount;
 
     public function __construct($data)
@@ -19,6 +19,7 @@ class PaymentDTO
         $this->paymentMethodId = $data['payment_method_id'];
         $this->email = $data['payer']['email'];
         $this->token = $data['token'];
+        $this->installments = $data['installments'];
         $this->amount = $data['transaction_amount'];
     }
 
@@ -120,10 +121,27 @@ class PaymentDTO
     /**
      * @return float
      */
-    public function getAmount() : float
+    public function getAmount(): float
     {
-        return (float) $this->amount;
+        return (float)$this->amount;
     }
+
+    /**
+     * @return int
+     */
+    public function getInstallments(): int
+    {
+        return $this->installments;
+    }
+
+    /**
+     * @param int $installments
+     */
+    public function setInstallments(int $installments): void
+    {
+        $this->installments = $installments;
+    }
+
 
     /**
      * @throws JsonException

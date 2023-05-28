@@ -21,10 +21,15 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
         return $router->app->version() . ' Users API';
     });
 
+    $router->group(['prefix' => 'payment'], function () use ($router) {
+        $router->get('/', 'PaymentController@get');
+        $router->post('/', 'PaymentController@store');
+    });
+});
+
+$router->group(['prefix' => 'fake'], function () use ($router) {
     $router->get('/email', function () use ($router) {
         return response()->json(['email' => Factory::create()->email]);
     });
-
-    $router->post('/payment', 'PaymentController@store');
 });
 

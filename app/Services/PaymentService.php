@@ -18,6 +18,15 @@ class PaymentService
     }
 
     /**
+     * @param int $paymentId
+     * @return Payment|null
+     */
+    public function getPayment(int $paymentId): ?Payment
+    {
+        return $this->paymentProvider->getPayment($paymentId);
+    }
+
+    /**
      * @param PaymentDTO $paymentData
      * @return Payment
      */

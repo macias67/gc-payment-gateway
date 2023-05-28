@@ -11,18 +11,23 @@ class StripeService implements PaymentServiceInterface
         // Lógica para crear el cliente de Stripe
     }
 
-    public function createPayment(PaymentDTO $paymentDTO) : void
+    public function createPayment(string $customerId, PaymentDTO $paymentDTO): void
     {
         // Lógica para crear el pago con Stripe
     }
 
-    public function getCustomer(string $clientId)
+    public function getCustomer(string $email): void
     {
         // TODO: Implement getCustomer() method.
     }
 
-    public function createCard(string $customerId, PaymentDTO $paymentDTO) : void
+    public function createCard(string $customerId, PaymentDTO $paymentDTO): void
     {
         // TODO: Implement createCard() method.
+    }
+
+    public function getPayment(int $paymentId): void
+    {
+        // TODO: Implement getPayment() method.
     }
 }

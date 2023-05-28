@@ -6,14 +6,14 @@ use Exception;
 use Illuminate\Http\Response;
 use Throwable;
 
-class CustomerException extends Exception
+class CardException extends Exception
 {
     protected $message;
 
     protected $code;
 
     public function __construct(
-        $message = "Error al crear cliente",
+        $message = "Error al crear tarjeta",
         $code = Response::HTTP_INTERNAL_SERVER_ERROR,
         Throwable $previous = null)
     {

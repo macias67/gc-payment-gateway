@@ -6,14 +6,14 @@ use Exception;
 use Illuminate\Http\Response;
 use Throwable;
 
-class CustomerException extends Exception
+class PaymentException extends Exception
 {
     protected $message;
 
     protected $code;
 
     public function __construct(
-        $message = "Error al crear cliente",
+        $message = "Error al crear pago",
         $code = Response::HTTP_INTERNAL_SERVER_ERROR,
         Throwable $previous = null)
     {
