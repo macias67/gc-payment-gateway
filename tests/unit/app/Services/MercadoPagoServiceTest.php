@@ -3,6 +3,7 @@
 namespace unit\app\Services;
 
 use App\Services\MercadoPagoService;
+use MercadoPago\Customer;
 use PHPUnit\Framework\TestCase;
 
 class MercadoPagoServiceTest extends TestCase
