@@ -29,9 +29,9 @@ class PaymentController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function store(Request           $request,
-                          PaymentService    $paymentService,
-                          ActivationService $activationService): JsonResponse
+    public function handler(Request           $request,
+                            PaymentService    $paymentService,
+                            ActivationService $activationService): JsonResponse
     {
         $data = $request->all();
         $paymentDTO = new PaymentDTO($data);
@@ -41,7 +41,10 @@ class PaymentController extends Controller
 
         if ($paymentService->isApprovedPayment($payment->status)) {
             // Reactivate Service
-            $activationService->sendActivationRequest($payment->id, $paymentDTO->getIdp(), $payment->transaction_amount);
+            $activationService->sendActivationRequest(
+                $payment->id,
+                $paymentDTO->getIdp(),
+                $payment->transaction_amount);
         }
 
         return response()->json([

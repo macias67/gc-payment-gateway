@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DTO\MPWebhookDTO;
 use App\DTO\PaymentDTO;
+use App\Repositories\PagoTarjetaRepository;
 use Illuminate\Support\Facades\Log;
 use MercadoPago\Payment;
 
@@ -11,12 +12,17 @@ class PaymentService
 {
     protected PaymentServiceInterface $paymentProvider;
 
+    protected PagoTarjetaRepository $pagoTarjetaRepository;
+
     /**
      * @param PaymentServiceInterface $paymentProvider
+     * @param PagoTarjetaRepository $pagoTarjetaRepository
      */
-    public function __construct(PaymentServiceInterface $paymentProvider)
+    public function __construct(PaymentServiceInterface $paymentProvider,
+                                PagoTarjetaRepository   $pagoTarjetaRepository)
     {
         $this->paymentProvider = $paymentProvider;
+        $this->pagoTarjetaRepository = $pagoTarjetaRepository;
     }
 
     /**
@@ -42,8 +48,28 @@ class PaymentService
         }
         // Create card's customer
         $card = $this->paymentProvider->createCard($customer->id, $paymentData);
+
         // Create payment
-        return $this->paymentProvider->createPayment($customer->id, $paymentData);
+        $payment = $this->paymentProvider->createPayment($customer->id, $paymentData);
+
+        $paymentDB = $this->pagoTarjetaRepository->create([
+            'cliente' => $paymentData->getIdp(),
+            'email' => $paymentData->getEmail(),
+            'procesador_pago' => 'mercado_pago',
+            'id_pago' => $payment->id,
+            'monto' => $payment->transaction_amount,
+            'estatus' => $payment->status,
+            'metadata' => [
+                'customer' => $customer->id,
+                'status' => $payment->status,
+                'status_detail' => $payment->status_detail,
+                'payment_type_id' => $payment->payment_type_id
+            ]
+        ]);
+
+        Log::debug('payment DB', $paymentDB->toArray());
+
+        return $payment;
     }
 
     /**
@@ -54,7 +80,12 @@ class PaymentService
     {
         $payment = $this->paymentProvider->getPayment($webhookData->getPaymentId());
 
+        $paymentDB = $this->pagoTarjetaRepository->findByPaymentId($payment->id);
+        $paymentDB->respuesta_webhook = true;
+        $paymentDB->save();
+
         Log::debug("payment webhook", $payment->toArray());
+        Log::debug("payment webhook db", $paymentDB->toArray());
     }
 
     /**

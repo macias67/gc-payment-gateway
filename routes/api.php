@@ -19,7 +19,7 @@ $router->get('/version', function () use ($router) {
 $router->group(['prefix' => 'v1'], function () use ($router) {
     $router->group(['prefix' => 'payment'], function () use ($router) {
         $router->get('/', 'PaymentController@get');
-        $router->post('/', 'PaymentController@store');
+        $router->post('/', 'PaymentController@handler');
     });
 
     $router->get('/user', function () use ($router) {
