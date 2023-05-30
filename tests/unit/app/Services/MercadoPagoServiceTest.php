@@ -22,7 +22,7 @@ class MercadoPagoServiceTest extends TestCase
         $this->assertEquals($email, $customer->email);
     }
 
-    public function testGetCustomerReturnsNullWhenCustomerNotFound()
+    public function testGetCustomerReturnsNullWhenCustomerNotFound(): void
     {
         $email = 'nonexistent@example.com';
 
