@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -60,6 +61,14 @@ class Handler extends ExceptionHandler
                 'message' => $e->getResponseMessage(),
                 'code' => $e->getCode(),
             ], $e->getStatusCode());
+        }
+
+        if ($e instanceof QueryException) {
+            return new JsonResponse([
+                'error' => "Server Error",
+                'message' => "Error with database connection",
+                'code' => $e->getCode(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return parent::render($request, $e);

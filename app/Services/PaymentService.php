@@ -56,7 +56,7 @@ class PaymentService
             'cliente' => $paymentData->getIdp(),
             'email' => $paymentData->getEmail(),
             'procesador_pago' => 'mercado_pago',
-            'id_pago' => $payment->id,
+            'id_pago' => (string)$payment->id,
             'monto' => $payment->transaction_amount,
             'estatus' => $payment->status,
             'metadata' => [
@@ -80,7 +80,7 @@ class PaymentService
     {
         $payment = $this->paymentProvider->getPayment($webhookData->getPaymentId());
 
-        $paymentDB = $this->pagoTarjetaRepository->findByPaymentId($payment->id);
+        $paymentDB = $this->pagoTarjetaRepository->findByPaymentId((string)$payment->id);
         $paymentDB->respuesta_webhook = true;
         $paymentDB->save();
 

@@ -18,7 +18,7 @@ class CreatePagosTarjetaTable extends Migration
             $table->integer('cliente')->index();
             $table->string('email')->index();
             $table->string('procesador_pago');
-            $table->integer('id_pago')->index();
+            $table->string('id_pago', 16)->index();
             $table->float('monto');
             $table->string('estatus');
             $table->boolean('respuesta_webhook')->default(false);
