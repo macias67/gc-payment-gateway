@@ -4,25 +4,30 @@ namespace App\Services;
 
 use App\DTO\MPWebhookDTO;
 use App\DTO\PaymentDTO;
+use App\Exceptions\CustomerException;
+use App\Repositories\ClienteRepository;
 use App\Repositories\PagoTarjetaRepository;
 use Illuminate\Support\Facades\Log;
 use MercadoPago\Payment;
 
 class PaymentService
 {
-    protected PaymentServiceInterface $paymentProvider;
-
-    protected PagoTarjetaRepository $pagoTarjetaRepository;
+    private PaymentServiceInterface $paymentProvider;
+    private PagoTarjetaRepository $pagoTarjetaRepository;
+    private ClienteRepository $clienteRepository;
 
     /**
      * @param PaymentServiceInterface $paymentProvider
      * @param PagoTarjetaRepository $pagoTarjetaRepository
+     * @param ClienteRepository $clienteRepository
      */
     public function __construct(PaymentServiceInterface $paymentProvider,
-                                PagoTarjetaRepository   $pagoTarjetaRepository)
+                                PagoTarjetaRepository   $pagoTarjetaRepository,
+                                ClienteRepository       $clienteRepository)
     {
         $this->paymentProvider = $paymentProvider;
         $this->pagoTarjetaRepository = $pagoTarjetaRepository;
+        $this->clienteRepository = $clienteRepository;
     }
 
     /**
@@ -37,9 +42,22 @@ class PaymentService
     /**
      * @param PaymentDTO $paymentData
      * @return Payment
+     * @throws CustomerException
      */
     public function processPayment(PaymentDTO $paymentData): Payment
     {
+        // Get client db info
+        $cliente = $this->clienteRepository->findById($paymentData->getIdp());
+
+        if ($cliente === null) {
+            Log::error('cliente repository not found', ['id' => $paymentData->getIdp()]);
+
+            throw new CustomerException();
+        }
+
+        //Set amount by DB
+        $paymentData->setAmount($cliente->mensual);
+
         // Validate if customer exist
         $customer = $this->paymentProvider->getCustomer($paymentData->getEmail());
         // Create customer

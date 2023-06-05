@@ -47,4 +47,11 @@ class PagoRepository implements RepositoryInterface
     {
         return Pago::all();
     }
+
+    public function findCorrespondeByClientId(int $clientId): ?Pago
+    {
+        return Pago::where('cliente', $clientId)
+            ->orderBy('id', 'desc')
+            ->first();
+    }
 }

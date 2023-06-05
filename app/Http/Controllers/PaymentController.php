@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTO\PaymentDTO;
+use App\Exceptions\CustomerException;
 use App\Services\ActivationService;
 use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
@@ -29,6 +30,13 @@ class PaymentController extends Controller
         ], Response::HTTP_OK);
     }
 
+    /**
+     * @param Request $request
+     * @param PaymentService $paymentService
+     * @param ActivationService $activationService
+     * @return JsonResponse
+     * @throws CustomerException
+     */
     public function handler(Request           $request,
                             PaymentService    $paymentService,
                             ActivationService $activationService): JsonResponse
@@ -41,10 +49,7 @@ class PaymentController extends Controller
 
         if ($paymentService->isApprovedPayment($payment->status)) {
             // Reactivate Service
-            $activationService->sendActivationRequest(
-                $payment->id,
-                $paymentDTO->getIdp(),
-                $payment->transaction_amount);
+            $activationService->sendActivationRequest($paymentDTO->getIdp(), $payment);
         }
 
         return response()->json([
