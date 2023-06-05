@@ -56,7 +56,7 @@ class PaymentService
         }
 
         //Set amount by DB
-        $paymentData->setAmount($cliente->mensual);
+        $paymentData->setAmount($cliente->mensual ?? 10);
 
         // Validate if customer exist
         $customer = $this->paymentProvider->getCustomer($paymentData->getEmail());
