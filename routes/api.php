@@ -21,11 +21,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
         $router->get('/', 'PaymentController@get');
         $router->post('/', 'PaymentController@handler');
     });
-
-    $router->get('/user', function () use ($router) {
-        return $router->app->version() . ' Users API';
-    });
-
+    $router->get('/user', 'ClientController@get');
     $router->post('/mp/webhook', 'WebhookController@handler');
 });
 
