@@ -17,7 +17,7 @@ class ClientController extends Controller
 
         return response()->json([
             'message' => 'Client information',
-            'client' => ($cliente === null) ? [] : $cliente->toArray()
+            'client' => ($cliente === null) ? null : $cliente->toArray()
         ], Response::HTTP_OK);
     }
 }
