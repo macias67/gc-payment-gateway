@@ -28,7 +28,7 @@ class ActivationService
         $data = [
             'idp' => $userId,
             'paymentId' => $payment->id,
-            'amount' => $payment->transaction_amount,
+            'amount' => (int)$payment->transaction_amount,
             'corresponde' => $pagoRecord->corresponde ?? null
         ];
 
@@ -38,7 +38,6 @@ class ActivationService
             $error = $response->body();
             Log::error('activation error', ['error' => $error]);
         } else {
-            // $responseBody = $response->body();
             Log::info('activation requested', $data);
         }
     }
